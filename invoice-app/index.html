@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0E7C86"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="format-detection" content="telephone=no">
+<title>Invoice Studio</title>
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-title" content="Invoices"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+@font-face{font-family:Manrope;font-weight:400;font-display:swap;src:url(lib/manrope-400.woff2) format("woff2")}@font-face{font-family:Manrope;font-weight:600;font-display:swap;src:url(lib/manrope-600.woff2) format("woff2")}@font-face{font-family:Manrope;font-weight:800;font-display:swap;src:url(lib/manrope-800.woff2) format("woff2")}
+:root{--bg:#EEF3F5;--card:#fff;--ink:#12263A;--mut:#5B6B7B;--line:#DCE4EA;--pri:#0E7C86;--pri2:#0A5F67;--acc:#F2A541;--ok:#1E9E62;--bad:#D64545;--info:#3B7DDD;--soft:#E3F2F3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1A24;--card:#162533;--ink:#E8EEF3;--mut:#9AABBA;--line:#27394A;--soft:#143A40;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1A24;--card:#162533;--ink:#E8EEF3;--mut:#9AABBA;--line:#27394A;--soft:#143A40;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Manrope,system-ui,Segoe UI,Arial,sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:16px}
+.top{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 0 18px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:20px;cursor:pointer}.brand small{display:block;font-weight:600;color:var(--mut);font-size:13px}
+h2{margin:0 0 4px;font-size:22px}h3{margin:18px 0 8px;font-size:16px}.mut{color:var(--mut)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.btn{border:0;border-radius:10px;padding:10px 16px;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;font:inherit;font-weight:600;cursor:pointer;background:var(--pri);color:#fff}
+.btn:hover{background:var(--pri2)}.btn.g{background:var(--soft);color:var(--pri)}.btn.d{background:transparent;color:var(--bad);border:1px solid var(--line)}.btn.a{background:var(--acc);color:#2b1c00}.btn.s{padding:8px 12px;font-size:14px;min-height:40px}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.f{display:block}.f span{display:block;font-size:13px;font-weight:600;margin-bottom:3px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:16px;min-height:44px;background:var(--card);color:var(--ink)}
+textarea{min-height:64px;resize:vertical}input[readonly]{background:var(--soft)}
+.big{display:flex;gap:14px;align-items:center;cursor:pointer;border-left:6px solid var(--pri)}.big.o{border-color:var(--acc)}.big b{font-size:18px}.big i{font-style:normal;font-size:30px}
+.stat b{display:block;font-size:24px}.stat{border-top:4px solid var(--pri)}.stat.p{border-color:var(--ok)}.stat.u{border-color:var(--acc)}.stat.n{border-color:var(--info)}
+.steps{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.steps span{padding:6px 14px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:13px}.steps .on{background:var(--pri);color:#fff;border-color:var(--pri)}.steps .ok{background:var(--soft);color:var(--pri)}
+.pick{cursor:pointer;display:flex;gap:12px;align-items:center;justify-content:space-between}.pick:hover{border-color:var(--pri)}
+.thumb{width:54px;height:54px;border-radius:9px;object-fit:cover;background:var(--soft);flex:none}
+.chip{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:800;color:#fff;background:var(--mut)}.chip.Sent{background:var(--info)}.chip.Paid{background:var(--ok)}.chip.Overdue{background:var(--bad)}
+.lay{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px;align-items:start}@media(max-width:900px){.lay{grid-template-columns:1fr}}
+.line{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.ov{overflow-x:auto}table.l{width:100%;border-collapse:collapse}table.l td,table.l th{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;display:none;z-index:9;max-width:90vw}
+/* invoice paper (always light, like a printed page) */
+.paper{background:#fff;color:#1F2328;padding:34px;font-size:12px;line-height:1.45;border:1px solid #DCE4EA;border-radius:8px;overflow:hidden}
+.paper h1{margin:0 0 14px;font-size:30px}.paper h2{font-size:17px;margin:0 0 4px}.paper h3{font-size:16px;margin:2px 0 4px}.paper .g{color:#6B7280}
+.paper .ph{display:flex;justify-content:space-between;gap:16px;margin-bottom:18px}.paper .ph img{max-width:190px;max-height:140px;object-fit:contain;align-self:flex-start}
+.paper .bx{border:1px solid #DCE4EA;border-radius:6px;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;margin-bottom:18px}
+.paper .mt{display:grid;grid-template-columns:auto auto;gap:6px 22px;align-content:start;text-align:right;margin-top:24px}
+.paper table{width:100%;border-collapse:collapse}.paper th{background:#F3F4F6;padding:7px 8px;font-size:10px;text-align:right}.paper th:first-child,.paper td:first-child{text-align:left}
+.paper td{padding:9px 8px;text-align:right;vertical-align:top}.paper td:first-child div{color:#6B7280}
+.paper .tt{margin:14px 0 0 auto;width:55%}.paper .tt div{display:flex;justify-content:space-between;padding:4px 8px}.paper .tt .am{font-size:15px;font-weight:800;padding-top:12px;border-top:1px solid #DCE4EA;margin-top:4px}
+input[type=checkbox]{min-height:0;height:22px;flex:none}
+@media(max-width:600px){.wrap{padding:12px}h2{font-size:20px}.stat b{font-size:20px}.row>.btn{flex:1 1 auto}#pv .paper{padding:16px;font-size:11px}#pv .paper h1{font-size:24px}#pv .paper .tt{width:100%}#pv .paper .bx{flex-direction:column}#pv .paper .mt{text-align:left;margin-top:4px}#pv .paper .ph img{max-width:110px;max-height:80px}}
+@media print{body{background:#fff}.no-print{display:none!important}.lay{display:block}.paper{border:0}}
+</style></head><body>
+<div class="wrap" id="app"></div><div id="toast" role="status"></div>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="lib/docx.umd.js"></script>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KEY='invoice-studio-v1',uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+window.structuredClone=window.structuredClone||(x=>JSON.parse(JSON.stringify(x)));
+let db={company:{vatRate:15,prefix:'INV'},customers:[],items:[],invoices:[],counter:0},view='home',draft=null,tmpC={},tmpI={qty:1,discount:0},saveItem=true,armed=null,q='',fs='';
+try{const r=localStorage.getItem(KEY);if(r)db=Object.assign(db,JSON.parse(r))}catch(e){}
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',3500)};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Could not save: browser storage is full or blocked. Use Backup to export your data.')}};
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const fmt=s=>s?new Date(s+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+const money=n=>'R'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const lineAmt=l=>Math.max(0,(+l.price||0)*(+l.qty||0)-(+l.discount||0));
+function totals(d){const s=d.lines.reduce((a,l)=>a+lineAmt(l),0),r=(+d.rate||0)/100;let vat=0,tot=s,sub=s;if(d.vatMode==='excl'){vat=s*r;tot=s+vat}else if(d.vatMode==='incl'){vat=s-s/(1+r);sub=s-vat}return{sub,vat,tot}}
+const status=i=>i.status!=='Paid'&&i.due&&i.due<iso(new Date())&&i.status!=='Draft'?'Overdue':i.status;
+function nextNo(){let n=db.counter,no;const p=db.company.prefix||'INV';do{n++;no=p+'-'+String(n).padStart(4,'0')}while(db.invoices.some(i=>i.no===no));return{no,n}}
+function newDraft(){const{no}=nextNo();draft={id:uid(),no,issued:iso(new Date()),due:'',cust:null,lines:[],vatMode:'excl',rate:db.company.vatRate??15,notes:'',status:'Draft'};tmpC={};go('cust')}
+function go(v){view=v;render();scrollTo(0,0)}
+// ---------- invoice paper ----------
+function paper(d,co){co=co||{};const t=totals(d),c=d.cust||{},br=s=>esc(s).replace(/\n/g,'<br>');
+const L=a=>a.filter(Boolean).map(br).join('<br>');
+return `<div class="paper"><div class="ph"><div><h1>INVOICE</h1><h2>${esc(co.name)||'Your company name'}</h2><div class="g">${L([co.reg&&'Company reg no: '+co.reg,co.vat&&'VAT no: '+co.vat,co.address,co.stand&&'Stand no: '+co.stand,co.phone,co.email&&'Email : '+co.email])}</div></div>${co.logo?`<img src="${co.logo}" alt="Logo">`:''}</div>
+<div class="bx"><div><b style="font-size:10px">BILL TO</b><h3>${esc(c.name)||'Customer name'}</h3><div class="g">${L([c.dept,c.address,c.vat&&'VAT no: '+c.vat,c.email])}</div></div>
+<div class="mt"><b style="font-size:10px">INVOICE #</b><span>${esc(d.no)}</span>${d.order?`<b style="font-size:10px">ORDER #</b><span>${esc(d.order)}</span>`:''}<b style="font-size:10px">ISSUED</b><span>${fmt(d.issued)}</span><b style="font-size:10px">DUE</b><span>${d.due?fmt(d.due):'&mdash;'}</span></div></div>
+<table><tr><th>ITEM</th><th>PRICE</th><th>QUANTITY</th><th>AMOUNT</th></tr>${d.lines.map(l=>`<tr><td>${esc(l.name)||'Item name'}<div>${br(l.desc)}${(+l.discount>0)?`<br>Discount: ${money(l.discount)}`:''}</div></td><td>${money(l.price)}</td><td style="text-align:center">${+l.qty||0}</td><td>${money(lineAmt(l))}</td></tr>`).join('')||'<tr><td colspan="4" class="g">No items yet</td></tr>'}</table>
+<div class="tt"><div><span>Subtotal</span><span>${money(t.sub)}</span></div>${d.vatMode!=='none'?`<div><span>VAT (${+d.rate||0}%)${d.vatMode==='incl'?' included':''}</span><span>${money(t.vat)}</span></div>`:''}<div><span>Total</span><span>${money(t.tot)}</span></div><div class="am"><span>Amount due</span><span>${money(t.tot)}</span></div></div>
+<div style="margin-top:24px"><b>Payment instruction</b><br>${L([co.bank,co.account&&'Account no: '+co.account,co.branch&&'Branch code: '+co.branch,co.acctType])}</div>${d.notes?`<div style="margin-top:14px" class="g">${br(d.notes)}</div>`:''}</div>`}
+// ---------- form helpers ----------
+const fld=(o,k,lb,ph,v,type='text',i='')=>`<label class="f"><span>${lb}</span><input type="${type}" ${type==='number'?'step="any" min="0"':''} placeholder="${esc(ph)}" value="${esc(v??'')}" data-o="${o}" data-k="${k}" data-i="${i}" oninput="S(this)"></label>`;
+const area=(o,k,lb,ph,v,i='')=>`<label class="f"><span>${lb}</span><textarea placeholder="${esc(ph)}" data-o="${o}" data-k="${k}" data-i="${i}" oninput="S(this)">${esc(v??'')}</textarea></label>`;
+function S(el){const{o,k,i}=el.dataset,v=el.type==='number'?(el.value===''?'':+el.value):el.value;const t={co:db.company,d:draft,l:draft&&draft.lines[i],c:tmpC,it:tmpI}[o];if(!t)return;t[k]=v;if(o==='co'&&k==='vatRate'&&draft)draft.rate=v;if(o==='co')save();upd()}
+function upd(){if(!draft)return;const p=$('#pv');if(p)p.innerHTML=paper(draft,db.company);draft.lines.forEach((l,i)=>{const e=$('#a'+i);if(e)e.textContent=money(lineAmt(l))});const h=$('#hd');if(h&&db.company.name)h.textContent=db.company.name}
+function pic(file,max,mime,cb){if(!file)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);const x=c.getContext('2d');if(mime==='image/jpeg'){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}x.drawImage(im,0,0,c.width,c.height);cb(c.toDataURL(mime,.85))};im.src=r.result};r.readAsDataURL(file)}
+const keep=fn=>{const y=scrollY;fn();scrollTo(0,y)};
+function logo(el){pic(el.files[0],500,'image/png',d=>{db.company.logo=d;save();keep(render)})}
+function coForm(){const c=db.company;return `<div class="grid g2">${fld('co','name','Company name','e.g. Mannda Khae Projects',c.name)}${fld('co','reg','Company reg no','e.g. 2017/380386/07',c.reg)}${fld('co','vat','VAT no','e.g. 4770316877',c.vat)}${fld('co','stand','Stand no','e.g. 4712',c.stand)}${fld('co','phone','Phone','e.g. +27 72 929 6148',c.phone,'tel')}${fld('co','email','Email address','e.g. info@yourcompany.co.za',c.email,'email')}</div>
+<div style="margin-top:12px">${area('co','address','Address','e.g. Makwarela Ext 3\nThohoyandou, 0950',c.address)}</div>
+<div class="row" style="margin-top:12px"><label class="f" style="flex:1"><span>Logo (shown top right of the invoice)</span><input type="file" accept="image/*" onchange="logo(this)"></label>${c.logo?`<img class="thumb" style="width:90px;height:60px;object-fit:contain" src="${c.logo}" alt="Logo"> <button class="btn d s" onclick="delete db.company.logo;save();keep(render)">Remove</button>`:''}</div>
+<h3>Payment instruction</h3><div class="grid g2">${fld('co','bank','Name of bank','e.g. First National Bank',c.bank)}${fld('co','account','Account number','e.g. 62942861289',c.account)}${fld('co','branch','Branch code (optional)','e.g. 250655',c.branch)}${fld('co','acctType','Account type','e.g. Cheque',c.acctType)}</div>
+<h3>Invoice settings</h3><div class="grid g2">${fld('co','prefix','Invoice number prefix','e.g. INV',c.prefix)}${fld('co','vatRate','Default VAT rate (%)','e.g. 15',c.vatRate,'number')}</div>`}
+// ---------- views ----------
+const steps=n=>`<div class="steps">${['1 Customer','2 Items','3 Review & download'].map((s,i)=>`<span class="${i+1===n?'on':i+1<n?'ok':''}">${s}</span>`).join('')}</div>`;
+function render(){const a=$('#app'),c=db.company;
+if(!c.name){a.innerHTML=`<div class="card" style="max-width:520px;margin:12vh auto"><h2>Welcome to Invoice Studio</h2><p class="mut">Create professional invoices in minutes. First, tell us who you are invoicing as.</p><label class="f"><span>What is your company name?</span><input id="cn" placeholder="e.g. Mannda Khae Projects" onkeydown="if(event.key==='Enter')setName()"></label><p><button class="btn" onclick="setName()">Continue</button></p></div>`;return}
+a.innerHTML=`<div class="top no-print"><div class="brand" onclick="go('home')">&#129534; <span id="hd">${esc(c.name)}</span><small>Invoice Studio</small></div><div class="row"><button class="btn g" onclick="go('home')">Home</button><button class="btn" onclick="newDraft()">+ New invoice</button></div></div><div id="v"></div>`;
+({home,cust,items,review,docs,settings}[view]||home)($('#v'))}
+function setName(){const v=$('#cn').value.trim();if(!v)return toast('Please enter your company name.');db.company.name=v;save();render()}
+function installTip(){try{if(/iPhone|iPad/.test(navigator.userAgent)&&!navigator.standalone&&!localStorage.getItem('tipx'))return `<div class="card" style="border-left:6px solid var(--acc)"><b>Install on your iPhone</b><p class="mut" style="margin:4px 0 10px">Tap the Share button in Safari, then <b>Add to Home Screen</b>. It opens full screen like an app and works offline. Always open it from that icon so your data stays in one place.</p><button class="btn g s" onclick="localStorage.setItem('tipx',1);render()">Got it</button></div>`}catch(e){}return ''}
+function home(v){const inv=db.invoices,sum=f=>inv.filter(f).reduce((a,i)=>a+totals(i).tot,0),ov=inv.filter(i=>status(i)==='Overdue');
+v.innerHTML=`${installTip()}<h2>Hello, ${esc(db.company.name)}</h2><p class="mut">What would you like to do today?</p><div class="grid g4" style="margin-bottom:14px"><div class="card stat"><span class="mut">Total invoiced</span><b>${money(sum(()=>1))}</b></div><div class="card stat p"><span class="mut">Paid</span><b>${money(sum(i=>i.status==='Paid'))}</b></div><div class="card stat u"><span class="mut">Outstanding</span><b>${money(sum(i=>i.status!=='Paid'))}</b></div><div class="card stat n"><span class="mut">Invoices${ov.length?` (${ov.length} overdue)`:''}</span><b>${inv.length}</b></div></div>
+<div class="grid g2"><div class="card big" onclick="newDraft()"><i>&#10133;</i><div><b>New invoice</b><br><span class="mut">Pick a customer, add items, download</span></div></div><div class="card big o" onclick="go('docs')"><i>&#128193;</i><div><b>Created documents</b><br><span class="mut">Search, edit, duplicate, mark as paid</span></div></div><div class="card big" onclick="go('settings')"><i>&#127970;</i><div><b>Company details &amp; logo</b><br><span class="mut">Reg no, VAT, address, bank details</span></div></div></div>
+<div class="card"><b>Backup &amp; restore</b><p class="mut">Your data is stored in this browser on this device. Save a backup file regularly, and load it to restore on another device.</p><div class="row"><button class="btn g" onclick="backup()">Save backup</button><label class="btn g" style="cursor:pointer">Restore from backup<input type="file" accept=".json,application/json" hidden onchange="restore(this)"></label></div></div>`}
+function settings(v){v.innerHTML=`<h2>Company details</h2><p class="mut">Filled in once, used on every invoice. Saved automatically.</p><div class="card">${coForm()}</div><button class="btn" onclick="go('home')">Done</button>`}
+function cust(v){const cs=db.customers;
+v.innerHTML=`${steps(1)}<h2>Who is this invoice for?</h2><p class="mut">Choose a saved customer or add a new one.</p>${cs.map(c=>`<div class="card pick" onclick="pickC('${c.id}')"><div><b>${esc(c.name)}</b><br><span class="mut">${esc([c.dept,c.email].filter(Boolean).join(' · '))}</span></div><button class="btn d s" onclick="event.stopPropagation();delC('${c.id}')">Delete</button></div>`).join('')||'<div class="card mut">No saved customers yet. Add your first one below.</div>'}
+<div class="card"><h3 style="margin-top:0">Add a new customer</h3><div class="grid g2">${fld('c','name','Customer name','e.g. University of Venda',tmpC.name)}${fld('c','dept','Department / contact (optional)','e.g. Supply chain',tmpC.dept)}${fld('c','vat','VAT no (optional)','e.g. 4390218818',tmpC.vat)}${fld('c','email','Email (optional)','e.g. accounts@univen.ac.za',tmpC.email,'email')}</div><div style="margin:12px 0">${area('c','address','Address','e.g. Thohoyandou\n0950',tmpC.address)}</div><button class="btn" onclick="addC()">Save customer &amp; continue</button></div>`}
+function addC(){if(!(tmpC.name||'').trim())return toast('Enter the customer name, e.g. University of Venda.');const c={...tmpC,id:uid()};db.customers.push(c);save();tmpC={};pickC(c.id)}
+function pickC(id){draft.cust={...db.customers.find(c=>c.id===id)};go('items')}
+function delC(id){if(armed!==id){armed=id;toast('Tap Delete again to remove this customer.');return}armed=null;db.customers=db.customers.filter(c=>c.id!==id);save();render()}
+function items(v){const its=db.items;
+v.innerHTML=`${steps(2)}<h2>What are you invoicing?</h2><p class="mut">Billing <b>${esc(draft.cust?.name)}</b>. <a href="#" onclick="go('cust');return false">Change customer</a></p>
+${its.length?`<h3>Saved items</h3><div class="grid g2">${its.map(i=>`<div class="card pick" style="margin:0"><div class="row" style="flex-wrap:nowrap">${i.photo?`<img class="thumb" src="${i.photo}" alt="">`:'<div class="thumb"></div>'}<div><b>${esc(i.name)}</b><br><span class="mut">${esc(i.code||'')} ${money(i.price)}</span></div></div><div class="row" style="flex-wrap:nowrap"><button class="btn s" onclick="addLine('${i.id}')">Add</button><button class="btn d s" onclick="delI('${i.id}')">&times;</button></div></div>`).join('')}</div>`:''}
+<div class="card" style="margin-top:14px"><h3 style="margin-top:0">Add a new item</h3><div class="grid g2">${fld('it','name','Name of item','e.g. 12000btu midwall split aircon (Samsung inverter)',tmpI.name)}${fld('it','code','Product code','e.g. AC-12K-SAM',tmpI.code)}${fld('it','price','Price (R)','e.g. 12000',tmpI.price,'number')}${fld('it','qty','Quantity','e.g. 1',tmpI.qty,'number')}${fld('it','discount','Discount amount (R)','e.g. 500',tmpI.discount,'number')}<label class="f"><span>Photo (optional)</span><input type="file" accept="image/*" onchange="pic(this.files[0],240,'image/jpeg',d=>{tmpI.photo=d;toast('Photo added')})"></label></div>
+<div style="margin:12px 0">${area('it','desc','Description (shows under the item name)','e.g. Supply and installation',tmpI.desc)}</div><label class="row" style="margin-bottom:12px"><input type="checkbox" style="width:auto" ${saveItem?'checked':''} onchange="saveItem=this.checked"> Save this item for next time</label><button class="btn" onclick="addNewItem()">Add to invoice</button></div>
+<div class="card"><b>On this invoice: ${draft.lines.length} item${draft.lines.length===1?'':'s'}</b>${draft.lines.map((l,i)=>`<div class="row" style="justify-content:space-between;margin-top:6px"><span>${esc(l.name)} &times; ${l.qty}</span><button class="btn d s" onclick="draft.lines.splice(${i},1);keep(render)">Remove</button></div>`).join('')}</div>
+<div class="row"><button class="btn g" onclick="go('cust')">Back</button><button class="btn" onclick="draft.lines.length?go('review'):toast('Add at least one item first.')">Continue to review</button></div>`}
+const lineOf=i=>({name:i.name,code:i.code,desc:i.desc,price:+i.price||0,qty:+i.qty||1,discount:+i.discount||0});
+function addLine(id){draft.lines.push(lineOf(db.items.find(i=>i.id===id)));toast('Item added');keep(render)}
+function addNewItem(){if(!(tmpI.name||'').trim())return toast('Enter the item name first.');if(saveItem){db.items.push({...tmpI,id:uid()});save()}draft.lines.push(lineOf(tmpI));tmpI={qty:1,discount:0};keep(render)}
+function delI(id){if(armed!==id){armed=id;toast('Tap × again to remove this saved item.');return}armed=null;db.items=db.items.filter(i=>i.id!==id);save();keep(render)}
+function review(v){const d=draft,exist=db.invoices.some(i=>i.id===d.id);
+v.innerHTML=`<div class="no-print">${steps(3)}</div><div class="lay"><div class="no-print">
+<div class="card"><h3 style="margin-top:0">Invoice details</h3><div class="grid g2"><label class="f"><span>Invoice number (created automatically)</span><input readonly value="${esc(d.no)}"></label><label class="f"><span>Date of issue (today, filled automatically)</span><input readonly value="${fmt(d.issued)}"></label>${fld('d','due','Due date','',d.due,'date')}${fld('d','order','Order number (optional)','e.g. PO-2026-0457',d.order)}<label class="f"><span>Status</span><select data-o="d" data-k="status" onchange="S(this)">${['Draft','Sent','Paid'].map(s=>`<option ${d.status===s?'selected':''}>${s}</option>`).join('')}</select></label><label class="f"><span>VAT</span><select data-o="d" data-k="vatMode" onchange="S(this)"><option value="excl" ${d.vatMode==='excl'?'selected':''}>Prices exclude VAT (add VAT)</option><option value="incl" ${d.vatMode==='incl'?'selected':''}>Prices include VAT</option><option value="none" ${d.vatMode==='none'?'selected':''}>No VAT</option></select></label>${fld('d','rate','VAT rate (%)','e.g. 15',d.rate,'number')}</div></div>
+<div class="card"><h3 style="margin-top:0">Bill to</h3><b>${esc(d.cust?.name)}</b> <a href="#" onclick="go('cust');return false">change</a></div>
+<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Items</h3><button class="btn g s" onclick="go('items')">+ Add more items</button></div><div style="margin-top:10px">${d.lines.map((l,i)=>`<div class="line"><div class="grid g2">${fld('l','name','Item name','e.g. 18000btu midwall split unit',l.name,'text',i)}${fld('l','price','Price (R)','e.g. 11600',l.price,'number',i)}${fld('l','qty','Quantity','e.g. 1',l.qty,'number',i)}${fld('l','discount','Discount (R)','e.g. 0',l.discount,'number',i)}</div><div style="margin:10px 0">${area('l','desc','Description','e.g. Supply and installation',l.desc,i)}</div><div class="row" style="justify-content:space-between"><b>Amount: <span id="a${i}">${money(lineAmt(l))}</span></b><button class="btn d s" onclick="draft.lines.splice(${i},1);keep(render)">Remove</button></div></div>`).join('')}</div></div>
+<div class="card">${area('d','notes','Notes &amp; terms (optional)','e.g. Payment due within 30 days. 12-month installation warranty.',d.notes)}</div>
+<details class="card"><summary><b>Company details, logo &amp; payment instruction</b></summary><div style="margin-top:12px">${coForm()}</div></details>
+<div class="row"><button class="btn" onclick="saveInv()">${exist?'Save changes':'Save invoice'}</button><button class="btn a" onclick="exp('pdf')">Download PDF</button><button class="btn a" onclick="exp('docx')">Download Word</button><button class="btn g" onclick="window.print()">Print</button></div></div>
+<div><div id="pv">${paper(d,db.company)}</div></div></div>`}
+function saveInv(){const d=draft;if(!d.cust)return toast('Choose a customer first.');if(!d.lines.length)return toast('Add at least one item.');
+const i=db.invoices.findIndex(x=>x.id===d.id);if(i<0&&db.invoices.some(x=>x.no===d.no))d.no=nextNo().no;
+d.co={...db.company};const n=parseInt(String(d.no).split('-').pop(),10);if(n>db.counter)db.counter=n;
+if(i<0)db.invoices.push(structuredClone(d));else db.invoices[i]=structuredClone(d);save();toast('Invoice '+d.no+' saved');keep(render)}
+function docs(v){v.innerHTML=`<h2>Created documents</h2><div class="card row"><div style="flex:2;min-width:200px"><input id="q" placeholder="Search by customer, invoice or order number, or date, e.g. Venda or INV-0003" value="${esc(q)}" oninput="q=this.value;list()"></div><div style="flex:1;min-width:140px"><select onchange="fs=this.value;list()">${['','Draft','Sent','Paid','Overdue'].map(s=>`<option value="${s}" ${fs===s?'selected':''}>${s||'All statuses'}</option>`).join('')}</select></div></div><div id="ls"></div>`;list()}
+function list(){const t=q.toLowerCase(),r=db.invoices.filter(i=>(!fs||status(i)===fs)&&(!t||[i.no,i.order,i.cust?.name,fmt(i.issued),fmt(i.due)].join(' ').toLowerCase().includes(t))).sort((a,b)=>b.issued.localeCompare(a.issued)||b.no.localeCompare(a.no));
+$('#ls').innerHTML=r.map(i=>`<div class="card"><div class="row" style="justify-content:space-between"><div><b>${esc(i.no)}</b> &nbsp;<span class="chip ${status(i)}">${status(i)}</span><br>${esc(i.cust?.name)}${i.order?` · Order ${esc(i.order)}`:''}<br><span class="mut">Issued ${fmt(i.issued)} · Due ${i.due?fmt(i.due):'not set'}</span></div><b style="font-size:18px">${money(totals(i).tot)}</b></div><div class="row" style="margin-top:10px"><select style="width:auto" onchange="setSt('${i.id}',this.value)">${['Draft','Sent','Paid'].map(s=>`<option ${i.status===s?'selected':''}>${s}</option>`).join('')}</select><button class="btn s" onclick="openI('${i.id}')">Edit</button><button class="btn g s" onclick="dup('${i.id}')">Duplicate</button><button class="btn g s" onclick="expI('${i.id}','pdf')">PDF</button><button class="btn g s" onclick="expI('${i.id}','docx')">Word</button><button class="btn d s" onclick="delInv('${i.id}')">${armed===i.id?'Tap again to delete':'Delete'}</button></div></div>`).join('')||'<div class="card mut">No documents found. Create your first invoice with “New invoice”.</div>'}
+const find=id=>db.invoices.find(i=>i.id===id);
+function setSt(id,s){find(id).status=s;save();list()}
+function openI(id){draft=structuredClone(find(id));go('review')}
+function dup(id){const o=structuredClone(find(id));const{no}=nextNo();Object.assign(o,{id:uid(),no,issued:iso(new Date()),due:'',order:'',status:'Draft'});delete o.co;draft=o;toast('Duplicated as '+no+'. Set the due date and save.');go('review')}
+function delInv(id){if(armed!==id){armed=id;list();return}armed=null;db.invoices=db.invoices.filter(i=>i.id!==id);save();list()}
+// ---------- downloads ----------
+async function saveFile(name,data){const b=data instanceof Blob?data:new Blob([data],{type:'application/json'});
+try{const f=new File([b],name,{type:b.type});if(/iPhone|iPad/.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e&&e.name==='AbortError')return}
+try{const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);toast('Saved '+name)}catch(e){toast('Could not save the file. Try Print and choose Save as PDF.')}}
+const expI=(id,k)=>{const i=find(id);doExp(i,i.co||db.company,k)};
+const exp=k=>{if(!draft.lines.length)return toast('Add at least one item first.');doExp(draft,db.company,k)};
+async function doExp(d,co,k){const nm='Invoice_'+d.no+'.'+k;toast('Preparing '+k.toUpperCase()+'…');try{await saveFile(nm,k==='pdf'?await pdfBlob(d,co):await docxBlob(d,co))}catch(e){toast('Could not create the file. Try Print instead.')}}
+// PDF-START
+function buildPdf(J,d,co,dm){const doc=new J({unit:'mm',format:'a4'}),M=15,W=180,t=totals(d),c=d.cust||{};let y=M;const K=[31,35,40],G=[107,114,128];
+const tx=(s,x,yy,o={})=>{doc.setFont('helvetica',o.b?'bold':'normal');doc.setFontSize(o.s||9);doc.setTextColor(...(o.c||K));doc.text(String(s),x,yy,{align:o.a||'left'})};
+const ls=a=>a.filter(Boolean).flatMap(x=>String(x).split('\n'));
+const wr=(s,w,z)=>{doc.setFont('helvetica','normal');doc.setFontSize(z||9);return doc.splitTextToSize(String(s||''),w)};
+const wa=(a,w,z)=>ls(a).flatMap(x=>wr(x,w,z));
+tx('INVOICE',M,y+8,{s:24,b:1});tx(co.name||'',M,y+17,{s:13,b:1});
+const cl=wa([co.reg&&'Company reg no: '+co.reg,co.vat&&'VAT no: '+co.vat,co.address,co.stand&&'Stand no: '+co.stand,co.phone,co.email&&'Email : '+co.email],110);
+cl.forEach((s,i)=>tx(s,M,y+23+i*4.4,{c:G}));let end=y+23+cl.length*4.4;
+if(co.logo&&dm){const s=Math.min(55/dm[0],40/dm[1]),w=dm[0]*s,h=dm[1]*s;try{doc.addImage(co.logo,'PNG',M+W-w,y,w,h)}catch(e){}end=Math.max(end,y+h)}
+y=end+6;
+const bl=wa([c.dept,c.address,c.vat&&'VAT no: '+c.vat,c.email],90),rows=[['INVOICE #',d.no],...(d.order?[['ORDER #',d.order]]:[]),['ISSUED',fmt(d.issued)],['DUE',d.due?fmt(d.due):'']],bh=Math.max(17+bl.length*4.4,rows.length*6+12);
+doc.setDrawColor(217,220,225);doc.setLineWidth(.3);doc.roundedRect(M,y,W,bh,1.5,1.5);
+tx('BILL TO',M+4,y+6,{s:7,b:1});tx(c.name||'',M+4,y+12.5,{s:12,b:1});bl.forEach((s,i)=>tx(s,M+4,y+17.5+i*4.4,{c:G}));
+rows.forEach((r,i)=>{tx(r[0],M+W-62,y+13.5+i*6,{s:7,b:1});tx(r[1],M+W-4,y+13.5+i*6,{a:'right'})});y+=bh+8;
+const hdr=()=>{doc.setFillColor(243,244,246);doc.rect(M,y,W,8,'F');tx('ITEM',M+3,y+5.3,{s:7,b:1});tx('PRICE',M+112,y+5.3,{s:7,b:1,a:'right'});tx('QUANTITY',M+135,y+5.3,{s:7,b:1,a:'center'});tx('AMOUNT',M+W-3,y+5.3,{s:7,b:1,a:'right'});y+=8};hdr();
+d.lines.forEach(l=>{const nm=wr(l.name||'',95,10),ds=wa([l.desc,(+l.discount>0)&&'Discount: '+money(l.discount)],95,9),h=nm.length*4.8+ds.length*4.3+7;
+if(y+h>282){doc.addPage();y=M;hdr()}
+nm.forEach((s,i)=>tx(s,M+3,y+6+i*4.8,{s:10}));ds.forEach((s,i)=>tx(s,M+3,y+6+nm.length*4.8+i*4.3,{c:G}));
+tx(money(l.price),M+112,y+6,{s:10,a:'right'});tx(String(+l.qty||0),M+135,y+6,{s:10,a:'center'});tx(money(lineAmt(l)),M+W-3,y+6,{s:10,a:'right'});y+=h});
+if(y+45>282){doc.addPage();y=M}y+=4;const X=M+W-95;
+const row=(a,b,o={})=>{tx(a,X+3,y+4,o);tx(b,M+W-3,y+4,{...o,a:'right'});y+=7};
+doc.setDrawColor(217,220,225);doc.line(X,y,M+W,y);y+=1;
+row('Subtotal',money(t.sub));if(d.vatMode!=='none')row('VAT ('+(+d.rate||0)+'%)'+(d.vatMode==='incl'?' included':''),money(t.vat));row('Total',money(t.tot));y+=3;row('Amount due',money(t.tot),{s:12,b:1});y+=8;
+const pi=ls([co.bank,co.account&&'Account no: '+co.account,co.branch&&'Branch code: '+co.branch,co.acctType]);
+if(pi.length){if(y+pi.length*4.6+10>285){doc.addPage();y=M}tx('Payment instruction',M,y+4,{b:1});pi.forEach((s,i)=>tx(s,M,y+9+i*4.6));y+=11+pi.length*4.6}
+if(d.notes){const n=wa([d.notes],W);if(y+n.length*4.4+6>285){doc.addPage();y=M}y+=3;n.forEach((s,i)=>tx(s,M,y+4+i*4.4,{c:G}))}
+return doc}
+// PDF-END
+async function pdfBlob(d,co){const J=window.jspdf&&window.jspdf.jsPDF;if(!J)throw new Error('PDF library not loaded');const dm=co.logo?await dim(co.logo):null;return buildPdf(J,d,co,dm).output('blob')}
+const dim=s=>new Promise(r=>{const i=new Image();i.onload=()=>r([i.width,i.height]);i.onerror=()=>r([1,1]);i.src=s});
+async function docxBlob(d,co){const{Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,ImageRun,WidthType,AlignmentType:A,BorderStyle:B,ShadingType}=docx,t=totals(d),c=d.cust||{},F='Arial',GR='6B7280',nb={style:B.NONE,size:0,color:'FFFFFF'},NB={top:nb,bottom:nb,left:nb,right:nb},th={style:B.SINGLE,size:4,color:'D9DCE1'},ALL={...NB,insideHorizontal:nb,insideVertical:nb};
+const p=(x,o={})=>new Paragraph({alignment:o.al,spacing:{before:o.b||0,after:o.a||0},children:[new TextRun({text:String(x??''),font:F,size:o.s||18,bold:o.bold,color:o.c||'1F2328'})]});
+const L=a=>a.filter(Boolean).flatMap(x=>String(x).split('\n')).map(x=>p(x,{c:GR}));
+const cell=(w,ch,o={})=>new TableCell({width:{size:w,type:WidthType.DXA},borders:o.br||NB,margins:o.m,shading:o.sh,children:ch});
+let logoP=[new Paragraph({children:[]})];if(co.logo){const[w,h]=await dim(co.logo),W=Math.min(190,w),H=W*h/w;logoP=[new Paragraph({alignment:A.RIGHT,children:[new ImageRun({type:'png',data:Uint8Array.from(atob(co.logo.split(',')[1]),x=>x.charCodeAt(0)),transformation:{width:W,height:H}})]})]}
+const head=new Table({width:{size:10466,type:WidthType.DXA},columnWidths:[6466,4000],borders:ALL,rows:[new TableRow({children:[cell(6466,[p('INVOICE',{s:48,bold:true,a:240}),p(co.name||'',{s:28,bold:true,a:80}),...L([co.reg&&'Company reg no: '+co.reg,co.vat&&'VAT no: '+co.vat,co.address,co.stand&&'Stand no: '+co.stand,co.phone,co.email&&'Email : '+co.email])]),cell(4000,logoP)]})]});
+const lb=(x,b)=>p(x,{s:16,bold:true,al:A.RIGHT,a:100,b}),vl=(x,b)=>p(x,{al:A.RIGHT,a:100,b}),mg=(l,r)=>({top:140,bottom:140,left:l,right:r});
+const bill=new Table({width:{size:10466,type:WidthType.DXA},columnWidths:[5466,2500,2500],rows:[new TableRow({children:[cell(5466,[p('BILL TO',{s:16,bold:true,a:80}),p(c.name||'',{s:26,bold:true,a:80}),...L([c.dept,c.address,c.vat&&'VAT no: '+c.vat,c.email])],{br:{top:th,bottom:th,left:th,right:nb},m:mg(160,100)}),cell(2500,[lb('INVOICE #',320),...(d.order?[lb('ORDER #')]:[]),lb('ISSUED'),lb('DUE')],{br:{top:th,bottom:th,left:nb,right:nb},m:mg(100,100)}),cell(2500,[vl(d.no,320),...(d.order?[vl(d.order)]:[]),vl(fmt(d.issued)),vl(d.due?fmt(d.due):'')],{br:{top:th,bottom:th,left:nb,right:th},m:mg(100,160)})]})]});
+const W=[5466,1800,1400,1800],al=[A.LEFT,A.RIGHT,A.CENTER,A.RIGHT],hm={top:100,bottom:100,left:120,right:120};
+const rows=[new TableRow({tableHeader:true,children:['ITEM','PRICE','QUANTITY','AMOUNT'].map((x,i)=>cell(W[i],[p(x,{s:16,bold:true,al:al[i]})],{m:hm,sh:{type:ShadingType.CLEAR,fill:'F3F4F6',color:'auto'}}))})];
+d.lines.forEach(l=>rows.push(new TableRow({cantSplit:true,children:[[l.name||''],[money(l.price)],[String(+l.qty||0)],[money(lineAmt(l))]].map((x,i)=>cell(W[i],i?[p(x[0],{s:20,al:al[i]})]:[p(x[0],{s:20}),...String(l.desc||'').split('\n').filter(Boolean).map(z=>p(z,{c:GR,b:60})),...(+l.discount>0?[p('Discount: '+money(l.discount),{c:GR})]:[])],{m:{top:140,bottom:140,left:120,right:120}}))})));
+const items=new Table({width:{size:10466,type:WidthType.DXA},columnWidths:W,borders:ALL,rows});
+const tr=(a,b,big,top)=>new TableRow({children:[cell(5466,[new Paragraph({children:[]})]),cell(3200,[p(a,{s:big?24:18,bold:big,al:big?A.CENTER:A.LEFT})],{m:{top:80,bottom:80,left:120,right:120},br:{...NB,top:top?th:nb}}),cell(1800,[p(b,{s:big?26:18,bold:big,al:A.RIGHT})],{m:{top:80,bottom:80,left:120,right:120},br:{...NB,top:top?th:nb}})]});
+const tot=new Table({width:{size:10466,type:WidthType.DXA},columnWidths:[5466,3200,1800],borders:ALL,rows:[tr('Subtotal',money(t.sub),0,1),...(d.vatMode!=='none'?[tr('VAT ('+(+d.rate||0)+'%)'+(d.vatMode==='incl'?' included':''),money(t.vat))]:[]),tr('Total',money(t.tot)),tr('Amount due',money(t.tot),1)]});
+const sp=()=>p('',{a:200});
+const doc=new Document({styles:{default:{document:{run:{font:F,size:18}}}},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:720,bottom:720,left:720,right:720}}},children:[head,sp(),bill,sp(),items,sp(),tot,p('Payment instruction',{bold:true,b:400,a:80}),...L([co.bank,co.account&&'Account no: '+co.account,co.branch&&'Branch code: '+co.branch,co.acctType]).map(x=>x),...(d.notes?[p('',{a:120}),...String(d.notes).split('\n').map(z=>p(z,{c:GR}))]:[])]}]});
+return Packer.toBlob(doc)}
+// ---------- backup ----------
+const backup=()=>saveFile('invoice-studio-backup-'+iso(new Date())+'.json',JSON.stringify(db));
+function restore(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.invoices)||!Array.isArray(x.customers))throw 0;db=Object.assign({company:{},items:[],counter:0},x);save();toast('Backup restored');go('home')}catch(e){toast('That file is not a valid Invoice Studio backup.')}};r.readAsText(f)}
+render();
+try{if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+</script></body></html>
